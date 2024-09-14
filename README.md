@@ -32,105 +32,226 @@ Aptos Coin Swap and Minting Module: Setup and Usage Guide
 
 * * *
 
-Entry Points
-------------
+## Entrypoints
 
 ### `Create Pair`
 
-Creates a new swap pair, sets a fixed exchange rate, and sends initial coins to reserves. The module supports `create_pair` (1-1 coin), `create_triple_pair` (2-1 coins), and `create_quadruple_pair` (2-2 coins).
+Create new swap pair, set fixed exchange rate and send initial coins to reserves. Module has basic `create_pair` (1-1 coin), `create_triple_pair` (2-1 coins) and `create_quadruple_pair` (2-2 coins).
 
-**Arguments:** `creator: &signer, exchange_rates: vector<u64>, coin_a_reserves: u64, coin_b_reserves: u64`  
-**Type Arguments:** `CoinTypeA, CoinTypeB`
+Arguments: `creator: &signer, exchange_rates: vector<u64>, coin_a_reserves: u64, coin_b_reserves: u64`
+Type Arguments: CoinTypeA, CoinTypeB
 
-**Usage:**
+Usage:
 
+```js
+const moduleAddress = "0x0"; // pass your module address here
+const exchangeRates = [150];
+const coinsAAmount = 1000;
+const coinsBAmount = 1000;
+const coinTypeA = `${moduleAddress}::mint_coins::Minerals`;
+const coinTypeB = `${moduleAddress}::mint_coins::EnergyCrystals`;
+const decimals = 8;
 
-``const moduleAddress = "0x0"; // pass your module address here const exchangeRates = [150]; const coinsAAmount = 1000; const coinsBAmount = 1000; const coinTypeA = `${moduleAddress}::mint_coins::Minerals`; const coinTypeB = `${moduleAddress}::mint_coins::EnergyCrystals`; const decimals = 8;  const payload = {     type: "entry_function_payload",     function: `${moduleAddress}::swap_coins::create_pair`,     type_arguments: [coinTypeA, coinTypeB],     arguments: [exchangeRates, coinsAAmount * (10 ** decimals), coinsBAmount * (10 ** decimals)], };  try {     const txResult = await signAndSubmitTransaction(payload);     await client.waitForTransactionWithResult(txResult.hash); } catch (e) {     console.log(e); }``
+const payload = {
+    type: "entry_function_payload",
+    function: `${moduleAddress}::swap_coins::create_pair`,
+    type_arguments: [coinTypeA, coinTypeB],
+    arguments: [exchangeRates, coinsAAmount * (10 ** Decimals), coinsBAmount * (10 ** Decimals)],
+}
 
-* * *
+try {
+    const txResult = await signAndSubmitTransaction(payload);
+    await client.waitForTransactionWithResult(txResult.hash)
+} catch (e) {
+    console.log(e)
+}
+```
 
 ### `Increase Reserves`
 
-Transfers coins from a user to the resource account and increases reserve values. Anyone can call this method.  
-Supports `increase_reserves` (1-1 coin), `increase_triple_reserves` (2-1 coins), and `increase_quadruple_reserves` (2-2 coins).
+Transfer coins from user to resource account and increase reserve values. Anyone can call this method.
+Module has basic `increase_reserves` (1-1 coin), `increase_triple_reserves` (2-1 coins) and `increase_quadruple_reserves` (2-2 coins).
 
-**Arguments:** `user: &signer, pair_id: String, coin_amount_a: u64, coin_amount_b: u64`  
-**Type Arguments:** `CoinTypeA, CoinTypeB`
+Arguments: `user: &signer, pair_id: String, coin_amount_a: u64, coin_amount_b: u64`
+Type Arguments: CoinTypeA, CoinTypeB
 
-**Usage:**
+Usage:
 
+```js
+const moduleAddress = "0x0";
+const pairId = "0x1";
+const coinAmountA = 1000;
+const coinAmountB = 1000;
+const coinTypeA = `${moduleAddress}::mint_coins::Minerals`;
+const coinTypeB = `${moduleAddress}::mint_coins::EnergyCrystals`;
+const decimals = 8;
 
+const payload = {
+    type: "entry_function_payload",
+    function: `${moduleAddress}::swap_coins::create_pair`,
+    type_arguments: [coinTypeA, coinTypeB],
+    arguments: [pairId, coinAmountA * (10 ** Decimals), coinAmountB * (10 ** Decimals)],
+}
 
-``const moduleAddress = "0x0"; const pairId = "0x1"; const coinAmountA = 1000; const coinAmountB = 1000; const coinTypeA = `${moduleAddress}::mint_coins::Minerals`; const coinTypeB = `${moduleAddress}::mint_coins::EnergyCrystals`; const decimals = 8;  const payload = {     type: "entry_function_payload",     function: `${moduleAddress}::swap_coins::increase_reserves`,     type_arguments: [coinTypeA, coinTypeB],     arguments: [pairId, coinAmountA * (10 ** decimals), coinAmountB * (10 ** decimals)], };  try {     const txResult = await signAndSubmitTransaction(payload);     await client.waitForTransactionWithResult(txResult.hash); } catch (e) {     console.log(e); }``
+try {
+    const txResult = await signAndSubmitTransaction(payload);
+    await client.waitForTransactionWithResult(txResult.hash)
+} catch (e) {
+    console.log(e)
+}
+```
 
-* * *
 
 ### `Remove Pair`
 
-Removes a pair from `PairMeta` based on `pair_id` and returns all coins in reserves to the pair creator.  
-Supports `remove_pair` (1-1 coin), `remove_triple_pair` (2-1 coins), and `remove_quadruple_pair` (2-2 coins). Only the creator can remove the pair.
+Remove pair from PairMeta based on pair id and send all coins in reserves to pair creator.Module has basic `remove_pair` (1-1 coin), `remove_triple_pair` (2-1 coins) and `remove_quadruple_pair` (2-2 coins).
+Only creator of pair can remove it.
 
-**Arguments:** `creator: &signer, pair_id: String`  
-**Type Arguments:** `CoinTypeA, CoinTypeB`
+Arguments: `creator: &signer, pair_id: String`
+Type Arguments: CoinTypeA, CoinTypeB
 
-**Usage:**
+Usage:
 
-``const moduleAddress = "0x0"; // pass your module address here const coinTypeA = `${moduleAddress}::mint_coins::Minerals`; const coinTypeB = `${moduleAddress}::mint_coins::EnergyCrystals`; const pairId = "0x01";  const payload = {     type: "entry_function_payload",     function: `${moduleAddress}::swap_coins::remove_pair`,     type_arguments: [coinTypeA, CoinTypeB],     arguments: [pairId], };  try {     const txResult = await signAndSubmitTransaction(payload);     await client.waitForTransactionWithResult(txResult.hash); } catch (e) {     console.log(e); }``
+```js
+const moduleAddress = "0x0"; // pass your module address here
+const coinTypeA = `${moduleAddress}::mint_coins::Minerals`;
+const coinTypeB = `${moduleAddress}::mint_coins::EnergyCrystals`;
+const pairId = "0x01";
 
-* * *
+const payload = {
+    type: "entry_function_payload",
+    function: `${moduleAddress}::swap_coins::remove_pair`,
+    type_arguments: [coinTypeA, CoinTypeB],
+    arguments: [pairId],
+}
+
+try {
+    const txResult = await signAndSubmitTransaction(payload);
+    await client.waitForTransactionWithResult(txResult.hash)
+} catch (e) {
+    console.log(e)
+}
+```
 
 ### `Swap`
 
-Swaps `coinA` to `coinB` based on the saved exchange rate, provided there are sufficient coins in the reserves.  
-Supports `swap` (1-1 coin, `CoinA => CoinB`), `triple_swap` (2-1 coins, `CoinA + CoinB => CoinC`), and `quadruple_swap` (2-2 coins, `CoinA + CoinB => CoinC + CoinD`).
+Will swap coinA to coinB based on saved exchange rate and if pair has enough coins in reserves. Module has basic `swap` (1-1 coin, CoinA => CoinB), `triple_swap` (2-1 coins, CoinA and CoinB => CoinC) and `quadruple_swap` (2-2 coins, CoinA + CoinB => CoinC and CoinD).
 
-**Arguments:** `user: &signer, pair_id: String, coin_amount_a: u64`  
-**Type Arguments:** `CoinTypeA, CoinTypeB`
+Arguments: `user: &signer, pair_id: String, coin_amount_a: u64`
+Type Arguments: CoinTypeA, CoinTypeB
 
-**Usage:**
+Usage:
 
-``const moduleAddress = "0x0"; // pass your module address here const coinTypeA = `${moduleAddress}::mint_coins::Minerals`; const coinTypeB = `${moduleAddress}::mint_coins::EnergyCrystals`; const pairId = "0x01"; const coinsAAmount = 1000; const decimals = 8;  const payload = {     type: "entry_function_payload",     function: `${moduleAddress}::swap_coins::swap`,     type_arguments: [coinTypeA, coinTypeB],     arguments: [pairId, coinsAAmount * (10 ** decimals)], };  try {     const txResult = await signAndSubmitTransaction(payload);     await client.waitForTransactionWithResult(txResult.hash); } catch (e) {     console.log(e); }``
+```js
+const moduleAddress = "0x0"; // pass your module address here
+const coinTypeA = `${moduleAddress}::mint_coins::Minerals`;
+const coinTypeB = `${moduleAddress}::mint_coins::EnergyCrystals`;
+const pairId = "0x01";
+const coinsAAmount = 1000;
+const decimals = 8;
 
-* * *
+const payload = {
+    type: "entry_function_payload",
+    function: `${moduleAddress}::swap_coins::swap`,
+    type_arguments: [coinTypeA, CoinTypeB],
+    arguments: [pairId, coinsAAmount * (10 ** Decimals)],
+}
+// submit a tx
+try {
+    const txResult = await signAndSubmitTransaction(payload);
+    await client.waitForTransactionWithResult(txResult.hash)
+} catch (e) {
+    console.log(e)
+}
+```
 
-View Functions
---------------
+## View Functions
 
 ### `Get All Pairs`
 
-Returns a map of all pairs' metadata with their respective `pair_id`.
+Return map of all pairs meta with their pair id's.
 
-**Arguments:** None
+Arguments: no
 
-**Usage:**
+Usage:
 
-``const payload = {     function: `${moduleAddress}::swap_coins::get_all_pairs`,     type_arguments: [],     arguments: [] };  try {     const allPairsInfo = await provider.view(payload);     console.log(allPairsInfo[0].data); } catch (e) {     console.log(e); }``
+```js
+const payload = {
+    function: `${moduleAddress}::swap_coins::get_all_pairs`,
+    type_arguments: [],
+    arguments: []
+}
 
-* * *
+try {
+    const allPairsInfo = await provider.view(payload)
+    console.log(allPairsInfo[0].data)
+} catch(e) {
+    console.log(e)
+}
+```
 
 ### `Get Pair Info By Id`
 
-Returns pair metadata based on the `pair_id`.
+Return Pair meta based on pair id.
 
-**Arguments:** `pair_id: String`
+Arguments: `pair_id: String`
 
-**Usage:**
+Usage:
 
-``const pairId = "0x0"; const payload = {     function: `${moduleAddress}::swap_coins::get_pair_info_by_id`,     type_arguments: [],     arguments: [pairId] };  try {     const pairInfo = await provider.view(payload);     console.log(pairInfo[0].data); } catch (e) {     console.log(e); }``
+```js
+const pairId = "0x0"
+const payload = {
+    function: `${moduleAddress}::swap_coins::get_pair_info_by_id`,
+    type_arguments: [],
+    arguments: [pairId]
+}
 
-* * *
+try {
+    const allPairsInfo = await provider.view(payload)
+    console.log(allPairsInfo[0].data)
+} catch(e) {
+    console.log(e)
+}
+```
+
 
 ### `Get List of Events`
 
-The module has three basic events: `PairCreatedEvent`, `PairRemovedEvent`, and `SwapEvent`, structured as follows:
+Module has 3 basic events: `PairCreatedEvent`, `PairRemovedEvent`, `SwapEvent` with following formats:
+```sh
+PairCreatedEvent {
+    meta: PairMeta,
+}
 
+PairRemovedEvent {
+    meta: PairMeta,
+}
 
-`PairCreatedEvent {     meta: PairMeta, }  PairRemovedEvent {     meta: PairMeta, }  SwapEvent {     coins_from_name: vector<String>,     coins_to_name: vector<String>,     coins_from_amount: vector<u64>,     coins_to_amount: vector<u64>,     exchange_rates: vector<u64>,     timestamp: u64, }`
+SwapEvent {
+    coins_from_name: vector<String>,
+    coins_to_name: vector<String>,
+    coins_from_amount: vector<u64>,
+    coins_to_amount: vector<u64>,
+    exchange_rates: vector<u64>,
+    timestamp: u64,
+}
+```
 
-**Usage (example for swap events):**
+Usage (example with swap events)
 
-``const moduleAddress = "0x0"; const eventsStore = `${moduleAddress}::swap_coins::Events`;  try {     const eventsResult = await client.getEventsByEventHandle(moduleAddress, eventsStore, "swap_event");     console.log(eventsResult); } catch (e) {     console.log(e); }``
+```js
+const moduleAddress = "0x0"
+const eventsStore = `${moduleAddress}::swap_coins::Events`
 
-* * *
+try {
+    const eventsResult = await client.getEventsByEventHandle(moduleAddress, eventsStore, "swap_event")
+    console.log(eventsResult)
+} catch (e) {
+    console.log(e)
+}
+```
 
-SwapCoins module deployed on testnet [here](https://explorer.aptoslabs.com/account/0xecea4a4dca5110d757d5ef3f95b86a374efd1439d4d89a66f746588cd9789123?network=testnet).
+SwapCoins module deployed on testnet [here](https://explorer.aptoslabs.com/account/0xecea4a4dca5110d757d5ef3f95b86a374efd1439d4d89a66f746588cd9789123?network=testnet)
+
+Simple Diagram with all methods inside swap_coins.move:
+![alt text](https://github.com/mainguyen85/in-game-coin-swap-v2/blob/main/dexDiagram.png)
