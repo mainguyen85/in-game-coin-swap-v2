@@ -1,4 +1,5 @@
-#Aptos Coin Swap and Minting Module: Setup and Usage Guide
+Aptos Coin Swap and Minting Module: Setup and Usage Guide
+=========================================================
 
 ### Local Testing
 
